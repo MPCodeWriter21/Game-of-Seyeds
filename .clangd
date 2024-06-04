@@ -1,0 +1,50 @@
+# Compile flags section
+CompileFlags:
+  # Add flags to the default compilation command
+  Add:
+  # Remove flags from the default compilation command
+  Remove:
+  Compiler: clang++
+
+# Diagnostics section
+Diagnostics:
+  # Enable/disable Clang-Tidy checks
+  EnableClangTidy: true
+  # List of Clang-Tidy checks to add (empty by default)
+  ClangTidy:
+    Add: []
+    # List of Clang-Tidy checks to remove (empty by default)
+    Remove: []
+
+# Index section (indexing for code completion etc.)
+Index:
+  # Use on-disk background index (default)
+  Background: true
+
+# Compilation database section
+CompilationDatabase:
+  # Directory to search for compilation database (compile_commands.json etc.)
+  Directory: ""
+
+# Semantic analysis section
+Analysis:
+  # Analyze AST for features like code completion (default is on)
+  Enabled: true
+  # Analyze for diagnostics and code completion at the line the cursor is on (default is on)
+  ExtractingCursors: true
+  # Analyze for code completion for symbols from other files (default is on)
+  IncludeSystemSymbols: true
+
+# Release filtering section
+ReleaseFiltering:
+  # Only analyze files from the current compilation unit (default is off)
+  LimitedToCompilationUnit: false
+
+# Fallback flags section (used when no compilation database is found)
+FallbackFlags:
+  # Fallback language to use (default is C++)
+  Lang: "c++"
+  # Fallback standard to use (default is c++14)
+  Std: "c++14"
+  # List of additional flags to use (empty by default)
+  Add: []
