@@ -1,7 +1,7 @@
 # Compile flags section
 CompileFlags:
   # Add flags to the default compilation command
-  Add:
+  Add: [-std=c++20]
   # Remove flags from the default compilation command
   Remove:
   Compiler: clang++
