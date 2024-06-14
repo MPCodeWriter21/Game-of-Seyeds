@@ -18,7 +18,10 @@ else()
     add_compile_options(-Wall -Wextra -pedantic)
 endif()
 
-add_executable(main src/main.cpp)
+file(GLOB UTILS "src/utils/*.cpp")
+set(SOURCE_FILES src/main.cpp ${UTILS})
+
+add_executable(main ${SOURCE_FILES})
 target_include_directories(main PUBLIC src)
 
 # Clang tidy as optional static analyzer
