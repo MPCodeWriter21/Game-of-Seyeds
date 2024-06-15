@@ -1,5 +1,6 @@
 #include "exceptions.hpp"
 #include "json.hpp"
+#include <algorithm>
 #include <cctype>
 #include <cstddef>
 #include <format>
@@ -122,23 +123,7 @@ JsonObject *JsonObject::parse_json(const std::string &json_text)
     char first_char = json_text[0];
     while (std::isspace(first_char))
         first_char = json_text[++i];
-    if (first_char == '{')
-    {
-        return JsonObject::parse_dictionary(_carve_out(json_text, i));
-    }
-    else if (first_char == '[')
-    {
-        return JsonObject::parse_list(_carve_out(json_text, i));
-    }
-    else if (first_char == '"')
-    {
-        return JsonObject::parse_string(_carve_out(json_text, i));
-    }
-    else if ((first_char >= '0' && first_char <= '9') || first_char == '-')
-    {
-        return JsonObject::parse_number(_carve_out(json_text, i));
-    }
-    else if (first_char == 't')
+    if (first_char == 't')
     {
         if (json_text.length() < i + 4)
             throw UnexpectedTokenError('t', -1, i);
@@ -167,8 +152,25 @@ JsonObject *JsonObject::parse_json(const std::string &json_text)
     }
     else
     {
-        throw UnexpectedTokenError(first_char, -1, i);
+        try
+        {
+            if (first_char == '{')
+                return JsonObject::parse_dictionary(_carve_out(json_text, i));
+            else if (first_char == '[')
+                return JsonObject::parse_list(_carve_out(json_text, i));
+            else if (first_char == '"')
+                return JsonObject::parse_string(_carve_out(json_text, i));
+            else if ((first_char >= '0' && first_char <= '9') || first_char == '-')
+                return JsonObject::parse_number(_carve_out(json_text, i));
+        }
+        catch (std::runtime_error &error)
+        {
+            throw JsonParserError(
+                "Error parsing json data: " + (std::string)error.what()
+            );
+        }
     }
+    throw UnexpectedTokenError(first_char, -1, i);
 }
 
 JsonObject *JsonObject::parse_dictionary(const std::string json_text)
@@ -183,54 +185,57 @@ JsonObject *JsonObject::parse_dictionary(const std::string json_text)
     {
         if (std::isspace(json_text[i]))
             continue;
-        if (key == nullptr)
+        try
         {
-            if (json_text[i] != '"')
-                throw UnexpectedTokenError(std::format(
-                    "Found `{}`. Was expecting a double-quotation for a key of "
-                    "the dictionary.",
-                    json_text[i]
-                ));
-            key_obj = parse_string(_carve_out(json_text, i));
-            key = new std::string(key_obj->get_value<std::string>());
-            i += key->length() + 2;
-            while (i < json_text.length())
+            if (key == nullptr)
             {
-                if (std::isspace(json_text[i]))
+                if (json_text[i] != '"')
+                    throw UnexpectedTokenError(std::format(
+                        "Found `{}`. Was expecting a double-quotation for a key of "
+                        "the dictionary.",
+                        json_text[i]
+                    ));
+                key_obj = parse_string(_carve_out(json_text, i));
+                key = new std::string(key_obj->get_value<std::string>());
+                i += key->length() + 2;
+                while (i < json_text.length())
                 {
-                    i++;
-                    continue;
+                    if (std::isspace(json_text[i]))
+                    {
+                        i++;
+                        continue;
+                    }
+                    if (json_text[i] == ':')
+                        break;
+                    throw UnexpectedTokenError(json_text[i], -1, i);
                 }
-                if (json_text[i] == ':')
+            }
+            else
+            {
+                std::string item = _carve_out(json_text, i);
+                i += item.length();
+                item_map[*key] = parse_json(item);
+                delete key;
+                delete key_obj;
+                key = nullptr;
+                while (i < json_text.length())
                 {
-                    i++;
-                    break;
+                    if (std::isspace(json_text[i]))
+                    {
+                        i++;
+                        continue;
+                    }
+                    if (json_text[i] == ',' || json_text[i] == '}')
+                        break;
+                    throw UnexpectedTokenError(json_text[i], -1, i);
                 }
-                throw UnexpectedTokenError(json_text[i], -1, i);
             }
         }
-        else
+        catch (std::runtime_error &error)
         {
-            std::string item = _carve_out(json_text, i);
-            i += item.length();
-            item_map[*key] = parse_json(item);
-            delete key;
-            delete key_obj;
-            key = nullptr;
-            while (i < json_text.length())
-            {
-                if (std::isspace(json_text[i]))
-                {
-                    i++;
-                    continue;
-                }
-                if (json_text[i] == ',' || json_text[i] == '}')
-                {
-                    i++;
-                    break;
-                }
-                throw UnexpectedTokenError(json_text[i], -1, i);
-            }
+            throw JsonParserError(std::format(
+                "Error parsing dictionary(i={}): {}", i, (std::string)error.what()
+            ));
         }
     }
     return new JsonObject(item_map);
@@ -246,22 +251,28 @@ JsonObject *JsonObject::parse_list(const std::string json_text)
     {
         if (std::isspace(json_text[i]))
             continue;
-        std::string item = _carve_out(json_text, i);
-        items.push_back(parse_json(item));
-        i += item.length();
-        while (i < json_text.length())
+        try
         {
-            if (std::isspace(json_text[i]))
+            std::string item = _carve_out(json_text, i);
+            items.push_back(parse_json(item));
+            i += item.length();
+            while (i < json_text.length())
             {
-                i++;
-                continue;
+                if (std::isspace(json_text[i]))
+                {
+                    i++;
+                    continue;
+                }
+                if (json_text[i] == ',' || json_text[i] == ']')
+                    break;
+                throw UnexpectedTokenError(json_text[i], -1, i);
             }
-            if (json_text[i] == ',' || json_text[i] == ']')
-            {
-                i++;
-                break;
-            }
-            throw UnexpectedTokenError(json_text[i], -1, i);
+        }
+        catch (std::runtime_error &error)
+        {
+            throw JsonParserError(std::format(
+                "Error parsing list(i={}): {}", i, (std::string)error.what()
+            ));
         }
     }
     return new JsonObject(items);
@@ -568,7 +579,11 @@ std::string _carve_out(const std::string &whole_text, const size_t start)
     }
     else
         throw std::runtime_error(
-            "The input data must begin with `{` or `[` or `\"` or be a number!"
+            "The input data must begin with `{` or `[` or `\"` or be a number!\n"
+            "Data: " +
+            whole_text.substr(
+                start, std::min<size_t>({21, whole_text.length() - start})
+            )
         );
 }
 

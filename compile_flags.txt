@@ -2,3 +2,4 @@
 -Wall
 -Wextra
 -Isrc
+-Ibuild/_deps/curl-src/include/
