@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # export compiler flags for code completion engines
-set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
@@ -86,8 +86,9 @@ else()
     add_compile_options(-Wall -Wextra -pedantic)
 endif()
 
-file(GLOB UTILS "src/utils/*.cpp")
-set(SOURCE_FILES src/main.cpp ${UTILS})
+file(GLOB UTILS_SOURCES "src/utils/*.cpp")
+file(GLOB API_SOURCES "src/api/*.cpp")
+set(SOURCE_FILES src/main.cpp ${UTILS_SOURCES} ${API_SOURCES})
 
 add_executable(main ${SOURCE_FILES})
 target_include_directories(main PUBLIC src)

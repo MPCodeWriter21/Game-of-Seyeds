@@ -37,6 +37,15 @@ cmake ..
 cmake --build .
 ```
 
+Features and Plans
+------------------
+
++ [x] Have a handwritten custom JSON parser.
++ [x] Have CMake download the cURL.
++ [x] Send requests to the OpenTDB API and get questions in a nicely formatted form.
++ [ ] A simple GUI
++ [ ] Multiplayer with sockets
+
 About
 -----
 

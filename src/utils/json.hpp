@@ -16,17 +16,18 @@ namespace json
 
 enum JsonObjectType
 {
-    null,
-    INTEGER,
-    FLOAT,
-    STRING,
-    BOOLEAN,
-    LIST,
-    DICTIONARY
+    null = 0,
+    INTEGER = 1,
+    FLOAT = 2,
+    STRING = 3,
+    BOOLEAN = 4,
+    LIST = 5,
+    DICTIONARY = 6
 };
 
 class JsonObject
 {
+    JsonObject(const JsonObject &) = delete;
     // TODO: Add a open file function
   public:
     JsonObject();
@@ -41,6 +42,7 @@ class JsonObject
         const std::initializer_list<std::string> &names,
         const std::initializer_list<JsonObject *> &items
     );
+    JsonObject(const int &value) = delete;
     std::string to_string() const;
     const JsonObjectType &get_type() const;
     template <typename T> inline const T &get_value() const;
@@ -68,6 +70,12 @@ std::string _carve_out(const std::string &whole_text, const size_t i);
 
 template <typename T> inline const T &JsonObject::get_value() const
 {
+    // Check if the type is supported
+    static_assert(
+        std::is_same<T, long long>::value || std::is_same<T, double>::value ||
+            std::is_same<T, std::string>::value || std::is_same<T, bool>::value,
+        "Invalid type T"
+    );
     if (type == JsonObjectType::null || type > JsonObjectType::BOOLEAN)
         throw std::invalid_argument(
             "This method only works for JsonObjects of type INTEGER(1), FLOAT(2), "

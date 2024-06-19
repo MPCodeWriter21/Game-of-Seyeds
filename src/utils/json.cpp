@@ -4,7 +4,7 @@
 #include <cctype>
 #include <cstddef>
 #include <format>
-#include <iostream>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 
@@ -112,7 +112,10 @@ const JsonObject *JsonObject::get_item(const std::string &key) const
             "This method only works for DICTIONARIES(6). Current object type: " +
             std::to_string(type)
         );
-    return (*item_map)[key];
+    auto it = (*item_map).find(key);
+    if (it == (*item_map).end())
+        return nullptr;
+    return it->second;
 }
 
 JsonObject *JsonObject::parse_json(const std::string &json_text)

@@ -1,14 +1,15 @@
+#pragma once
+
 #include <format>
 #include <stdexcept>
 
-#define LONG long long
+#define _LONG long long
 
 class JsonParserError : public std::runtime_error
 {
   public:
     JsonParserError() : std::runtime_error("JsonParserError") {}
     JsonParserError(const std::string &message) : std::runtime_error(message) {}
-    const char *what() const { return std::runtime_error::what(); }
 };
 
 class CarveOutError : public JsonParserError
@@ -44,7 +45,7 @@ class UnexpectedCharacterError : public CarveOutError
           )
     {}
     UnexpectedCharacterError(
-        const char &character, const LONG &line, const LONG &index
+        const char &character, const _LONG &line, const _LONG &index
     )
         : CarveOutError(std::format(
               "Unexpected `{}` character at {}:{}", _escape_char(character), line, index
@@ -60,7 +61,7 @@ class UnexpectedTokenError : public JsonParserError
     UnexpectedTokenError(const char &character)
         : JsonParserError(std::format("Unexpected token `{}`.", character))
     {}
-    UnexpectedTokenError(const char &character, const LONG &line, const LONG &index)
+    UnexpectedTokenError(const char &character, const _LONG &line, const _LONG &index)
         : JsonParserError(
               std::format("Unexpected token `{}` at {}:{}", character, line, index)
           )
@@ -87,3 +88,18 @@ class ParseListError : public JsonParserError
     ParseListError() : JsonParserError("ParseListError") {}
     ParseListError(const std::string &message) : JsonParserError(message) {}
 };
+
+class CurlFailedToInitiateError : public std::runtime_error
+{
+  public:
+    CurlFailedToInitiateError() : std::runtime_error("Failed to Initiate cURL!") {}
+    CurlFailedToInitiateError(const std::string &message) : std::runtime_error(message) {}
+};
+
+class InvalidJsonObject : public std::runtime_error
+{
+  public:
+    InvalidJsonObject() : std::runtime_error("The input JSON object is not valid.") {}
+    InvalidJsonObject(const std::string &message) : std::runtime_error(message) {}
+};
+
