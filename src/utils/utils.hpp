@@ -7,3 +7,5 @@ std::string url_decode(const std::string &url_encoded_data);
 size_t curl_write_to_string_callback(
     void *contents, size_t size, size_t nmemb, void *userp
 );
+void init_curl();
+void clean_curl();

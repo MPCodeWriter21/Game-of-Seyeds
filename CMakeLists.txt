@@ -54,6 +54,18 @@ else()
     find_package(OpenSSL REQUIRED)
 endif()
 
+include(FetchContent)
+
+# Fetch raylib
+FetchContent_Declare(
+  raylib
+  URL               https://github.com/raysan5/raylib/archive/refs/tags/5.0.tar.gz
+  FIND_PACKAGE_ARGS 5.0
+  DOWNLOAD_EXTRACT_TIMESTAMP true
+)
+set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
+FetchContent_MakeAvailable(raylib)
+
 if (MSVC)
 	set(CURL_PLATFORM_OPTIONS "CMAKE_USE_WINSSL ON;CMAKE_USE_OPENSSL OFF")
 else()
@@ -88,7 +100,8 @@ endif()
 
 file(GLOB UTILS_SOURCES "src/utils/*.cpp")
 file(GLOB API_SOURCES "src/api/*.cpp")
-set(SOURCE_FILES src/main.cpp ${UTILS_SOURCES} ${API_SOURCES})
+file(GLOB GUI_SOURCES "src/gui/*.cpp")
+set(SOURCE_FILES src/main.cpp ${UTILS_SOURCES} ${API_SOURCES} ${GUI_SOURCES})
 
 add_executable(main ${SOURCE_FILES})
 target_include_directories(main PUBLIC src)
@@ -96,6 +109,17 @@ target_include_directories(main PUBLIC src)
 target_include_directories(main PRIVATE "${curl_SOURCE_DIR}/include")
 
 target_link_libraries(main libcurl)
+target_link_libraries(main raylib)
+
+# Copy the resource files
+file(GLOB resources resources/*)
+file(COPY ${resources} DESTINATION "resources/")
+
+# Copy dynamic linked library files to the output directory
+add_custom_command(TARGET main POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:main> $<TARGET_RUNTIME_DLLS:main>
+  COMMAND_EXPAND_LISTS
+)
 
 # Clang tidy as optional static analyzer
 option(Seyed_USE_CLANG_TIDY "Use clang tidy for static analysis" OFF)

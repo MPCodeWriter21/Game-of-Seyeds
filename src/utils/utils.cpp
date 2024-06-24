@@ -29,3 +29,7 @@ size_t curl_write_to_string_callback(
     ((std::string *)userp)->append((char *)contents, size * nmemb);
     return size * nmemb;
 }
+
+void init_curl() { curl_global_init(CURL_GLOBAL_DEFAULT); }
+
+void clean_curl() { curl_global_cleanup(); }

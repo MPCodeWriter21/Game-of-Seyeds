@@ -3,3 +3,4 @@
 -Wextra
 -Isrc
 -Ibuild/_deps/curl-src/include/
+-Ibuild/_deps/raylib-src/src/

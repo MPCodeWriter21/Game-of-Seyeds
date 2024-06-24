@@ -4,7 +4,6 @@
 #include <cctype>
 #include <cstddef>
 #include <format>
-#include <iterator>
 #include <stdexcept>
 #include <string>
 
@@ -374,7 +373,12 @@ JsonObject::JsonObject() : type(JsonObjectType::null) {}
 
 JsonObject::JsonObject(const long long &value)
     : type(JsonObjectType::INTEGER), value((void *)new long long(value))
-{}
+{
+    static_assert(
+        std::is_same<decltype(value), const long long &>::value,
+        "This constructor only accepts const long long&"
+    );
+}
 
 JsonObject::JsonObject(const double &value)
     : type(JsonObjectType::FLOAT), value((void *)new double(value))
