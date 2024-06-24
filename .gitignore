@@ -39,3 +39,4 @@ build/
 .cache/
 test.*
 ENV
+*.json
