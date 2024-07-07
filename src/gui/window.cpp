@@ -15,23 +15,35 @@ Window::Window(
     SetTargetFPS(fps);
 }
 
-Image* Window::load_image(const std::string &name, const char *path)
+Image *Window::load_image(const std::string &name, const char *path)
 {
+    // Return the existing pointer if the image is already loaded.
+    if (image_map.find(name) != image_map.end())
+        return image_map[name];
     return image_map[name] = new Image(LoadImage(path));
 }
 
-Texture2D* Window::load_texture_2d(const std::string &name, const char *path)
+Texture2D *Window::load_texture_2d(const std::string &name, const char *path)
 {
+    // Return the existing pointer if the texture_2d is already loaded.
+    if (texture_2d_map.find(name) != texture_2d_map.end())
+        return texture_2d_map[name];
     return texture_2d_map[name] = new Texture2D(LoadTexture(path));
 }
 
-Sound* Window::load_sound(const std::string &name, const char *path)
+Sound *Window::load_sound(const std::string &name, const char *path)
 {
+    // Return the existing pointer if the sound is already loaded.
+    if (sound_map.find(name) != sound_map.end())
+        return sound_map[name];
     return sound_map[name] = new Sound(LoadSound(path));
 }
 
-Font* Window::load_font(const std::string &name, const char *path)
+Font *Window::load_font(const std::string &name, const char *path)
 {
+    // Return the existing pointer if the font is already loaded.
+    if (font_map.find(name) != font_map.end())
+        return font_map[name];
     return font_map[name] = new Font(LoadFont(path));
 }
 

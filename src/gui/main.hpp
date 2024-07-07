@@ -1,17 +1,17 @@
 #pragma once
 
-#include "gui/menu.hpp"
+#include "gui/frames/menu.hpp"
 #include "gui/window.hpp"
 #include "raylib.h"
 
 enum CurrentFrame
 {
     menu = 0,
-    multi_player_local = 1,
-    multi_player_network = 2,
-    single_player = 3,
-    multi_player_results = 4,
-    single_player_results = 5
+    pvp_local = 1,
+    pvp_network = 2,
+    survival = 3,
+    pvp_results = 4,
+    survival_results = 5
 };
 
 class MainApp : public Window
@@ -32,6 +32,7 @@ class MainApp : public Window
   private:
     Image background_image;
     Texture2D background;
+    Music background_music;
 
     CurrentFrame current_frame;
     MenuFrame menu_frame;

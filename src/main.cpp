@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
-#include <raylib.h>
 
 int main(void)
 {
