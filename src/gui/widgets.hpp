@@ -40,9 +40,11 @@ class Button : public Widget
     );
     void update() override;
     void draw() override;
-    const Vector2 &get_position() const { return text_position; }
     void set_text_position(const Vector2);
+    const Vector2 &get_position() const { return text_position; }
     void set_position(const Vector2);
+    void set_text(const std::string &);
+    const std::string &get_text() const { return text; }
     const Vector2 &get_text_size() const { return text_size; }
     Vector2 get_size() const { return {bounds.width, bounds.height}; }
     const Rectangle &get_bounds() const { return bounds; }
@@ -53,7 +55,7 @@ class Button : public Widget
 
   private:
     Vector2 text_position, text_size;
-    const char *text;
+    std::string text;
     const Font *font;
     int font_size;
     bool background = true;

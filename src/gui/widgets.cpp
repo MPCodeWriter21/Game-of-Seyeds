@@ -68,12 +68,13 @@ void Button::update()
 
 void Button::draw()
 {
-    Vector2 text_size = MeasureTextEx(*font, text, font_size, 1);
-    DrawTextureNPatch(
-        *texture_npatch, npatch_info, bounds, Vector2{0.0f, 0.0f}, 0.0f, WHITE
-    );
+    Vector2 text_size = MeasureTextEx(*font, text.c_str(), font_size, 1);
+    if (background)
+        DrawTextureNPatch(
+            *texture_npatch, npatch_info, bounds, Vector2{0.0f, 0.0f}, 0.0f, WHITE
+        );
     DrawTextEx(
-        *font, text,
+        *font, text.c_str(),
         Vector2{
             bounds.x + bounds.width / 2 - text_size.x / 2,
             bounds.y + bounds.height / 2 - text_size.y / 2
@@ -97,6 +98,18 @@ void Button::set_position(const Vector2 position)
     };
     bounds.x = position.x;
     bounds.y = position.y;
+}
+
+void Button::set_text(const std::string &text)
+{
+    this->text = text;
+    text_size = MeasureTextEx(*font, this->text.c_str(), this->font_size, 1);
+    bounds = Rectangle{
+        text_position.x - text_size.x / 8 - padding.x,
+        text_position.y - text_size.y / 4 - padding.y,
+        text_size.x + text_size.x / 4 + padding.x * 2,
+        text_size.y + text_size.y / 2 + padding.y * 2
+    };
 }
 
 Button::~Button() { delete[] text_color; }
