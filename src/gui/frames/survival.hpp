@@ -1,10 +1,12 @@
 #pragma once
 
+#include "api/opentdb.hpp"
 #include "gui/frame.hpp"
+#include "gui/widgets.hpp"
 #include "gui/window.hpp"
-#include "raylib.h"
+#include <vector>
 
-enum CurrentScreen
+enum SurvivalScreen
 {
     CHOOSING_DIFFICULTY = 0,
     ANSWERING_QUESTION = 1,
@@ -17,8 +19,26 @@ class SurvivalFrame : private Frame
     SurvivalFrame(Window *parent);
     void update();
     void draw();
+
+    void update_choosing_difficulty();
+    void draw_choosing_difficulty();
+
+    void update_answering_question();
+    void draw_answering_question();
+
+    void update_in_between_questions();
+    void draw_in_between_questions();
+
     ~SurvivalFrame();
 
   private:
-    CurrentScreen current_screen;
+    Font *m04_font;
+    Sound *blink_sound;
+
+    Button *choosing_difficulty_easy_button, *choosing_difficulty_medium_button,
+        *choosing_difficulty_hard_button;
+    SurvivalScreen current_screen = SurvivalScreen::CHOOSING_DIFFICULTY;
+    std::string difficulty = "easy";
+    std::vector<opentdb::Question> questions;
+    size_t question_index = 0;
 };

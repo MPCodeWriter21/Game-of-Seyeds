@@ -4,26 +4,31 @@
 
 Button::Button(
     Window *parent,
-    const Vector2 position,
+    const Vector2 text_position,
     const char *text,
     const Font *font,
     const int font_size,
+    bool background,
+    Vector2 padding,
     const ButtonState forced_state,
-    const unsigned int text_color_normal,
-    const unsigned int text_color_focused,
-    const unsigned int text_color_pressed
+    const Color text_color_normal,
+    const Color text_color_focused,
+    const Color text_color_pressed
 )
-    : Widget(parent), position(position), text(text), font(font),
-      font_size(font_size > 0 ? font_size : font->baseSize), forced_state(forced_state)
+    : Widget(parent), text_position(text_position), text(text), font(font),
+      font_size(font_size > 0 ? font_size : font->baseSize), background(background),
+      padding(padding), forced_state(forced_state)
 {
     text_color =
-        new unsigned int[3]{text_color_normal, text_color_focused, text_color_pressed};
+        new Color[3]{text_color_normal, text_color_focused, text_color_pressed};
     button_click_sound =
         parent->load_sound("_button_click_sound", "resources/button-click.wav");
-    Vector2 text_size = MeasureTextEx(*font, text, this->font_size, 1);
+    text_size = MeasureTextEx(*font, text, this->font_size, 1);
     bounds = Rectangle{
-        position.x - text_size.x / 10, position.y - text_size.y / 4,
-        text_size.x + text_size.x / 5, text_size.y + text_size.y / 2
+        text_position.x - text_size.x / 8 - padding.x,
+        text_position.y - text_size.y / 4 - padding.y,
+        text_size.x + text_size.x / 4 + padding.x * 2,
+        text_size.y + text_size.y / 2 + padding.y * 2
     };
     texture_npatch = parent->load_texture_2d("_button_npatch", "resources/npatch.png");
     npatch_info = NPatchInfo{
@@ -34,8 +39,8 @@ Button::Button(
 
 void Button::update()
 {
-    int state = (forced_state >= 0) ? forced_state : 0; // NORMAL
-    is_pressed = false;
+    state = (ButtonState)((forced_state >= 0) ? forced_state : 0);
+    pressed = false;
 
     // Update control
     if ((state < 3) && (forced_state < 0))
@@ -52,7 +57,7 @@ void Button::update()
 
             if (state == ButtonState::PRESSED && IsGestureDetected(GESTURE_TAP))
             {
-                is_pressed = true;
+                pressed = true;
                 PlaySound(*button_click_sound);
             }
         }
@@ -71,10 +76,27 @@ void Button::draw()
         *font, text,
         Vector2{
             bounds.x + bounds.width / 2 - text_size.x / 2,
-            bounds.y + bounds.height / 2 - text_size.y / 2 + 4
+            bounds.y + bounds.height / 2 - text_size.y / 2
         },
-        font_size, 1, GetColor(text_color[state])
+        font_size, 1, text_color[state]
     );
+}
+
+void Button::set_text_position(const Vector2 position)
+{
+    this->text_position = position;
+    bounds.x = position.x - text_size.x / 10 - padding.x;
+    bounds.y = position.y - text_size.y / 4 - padding.y;
+}
+
+void Button::set_position(const Vector2 position)
+{
+    this->text_position = Vector2{
+        position.x + text_size.x / 10 + padding.x,
+        position.y + text_size.y / 4 + padding.y
+    };
+    bounds.x = position.x;
+    bounds.y = position.y;
 }
 
 Button::~Button() { delete[] text_color; }

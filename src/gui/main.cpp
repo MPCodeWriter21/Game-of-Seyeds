@@ -14,6 +14,7 @@ MainApp::MainApp(
     background = LoadTextureFromImage(background_image);
     UnloadImage(background_image);
     background_music = LoadMusicStream("resources/background-music.mp3");
+    SetMusicVolume(background_music, 0.4f);
     PlayMusicStream(background_music);
 }
 

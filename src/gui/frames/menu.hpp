@@ -22,7 +22,6 @@ class MenuFrame : private Frame
     Rectangle survival_btn_rect, pvp_btn_rect, exit_btn_rect;
     Image background_image;
     Texture2D background;
-    Button *random_button = nullptr;
 
     Sound *menu_move_fx;
     Font *font, *bold_font;

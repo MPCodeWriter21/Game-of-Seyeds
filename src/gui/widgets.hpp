@@ -9,7 +9,7 @@ class Widget
     Widget(Window *parent) : parent(parent) {}
     virtual void update() = 0;
     virtual void draw() = 0;
-    ~Widget() {}
+    virtual ~Widget() {}
 
     Window *parent;
 };
@@ -22,7 +22,7 @@ enum ButtonState
     PRESSED = 2
 };
 
-class Button : Widget
+class Button : public Widget
 {
   public:
     Button(
@@ -31,25 +31,38 @@ class Button : Widget
         const char *text,
         const Font *font,
         const int font_size = 0,
+        bool background = true,
+        Vector2 padding = {5, 0},
         const ButtonState forced_state = ButtonState::STATE_LESS,
-        const unsigned int text_color_normal = 0xeff6ffff,
-        const unsigned int text_color_focused = 0x78e782ff,
-        const unsigned int text_color_pressed = 0xb04d5fff
+        const Color text_color_normal = {239, 246, 255, 255},
+        const Color text_color_focused = {120, 231, 130, 255},
+        const Color text_color_pressed = {176, 77, 95, 255}
     );
     void update() override;
     void draw() override;
+    const Vector2 &get_position() const { return text_position; }
+    void set_text_position(const Vector2);
+    void set_position(const Vector2);
+    const Vector2 &get_text_size() const { return text_size; }
+    Vector2 get_size() const { return {bounds.width, bounds.height}; }
+    const Rectangle &get_bounds() const { return bounds; }
+    bool is_pressed() const { return state == ButtonState::PRESSED; }
     ~Button();
 
-    const Vector2 position;
+    bool pressed = false;
+
+  private:
+    Vector2 text_position, text_size;
     const char *text;
     const Font *font;
     int font_size;
+    bool background = true;
+    Vector2 padding;
     const ButtonState forced_state;
-    const unsigned int *text_color;
+    const Color *text_color;
     Rectangle bounds;
     Texture2D *texture_npatch = nullptr;
     NPatchInfo npatch_info;
     Sound *button_click_sound = nullptr;
     ButtonState state = ButtonState::NORMAL;
-    bool is_pressed = false;
 };

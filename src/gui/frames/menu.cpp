@@ -37,8 +37,8 @@ MenuFrame::MenuFrame(Window *parent) : Frame(parent)
     UnloadImage(background_image);
 
     // Load fonts
-    font = parent->load_font("main", "resources/m04.TTF");
-    bold_font = parent->load_font("main", "resources/m04b.TTF");
+    font = parent->load_font("m04", "resources/m04.TTF");
+    bold_font = parent->load_font("m04b", "resources/m04b.TTF");
 
     // Load sound
     menu_move_fx = parent->load_sound("menu_move_fx", "resources/menu-move.wav");
