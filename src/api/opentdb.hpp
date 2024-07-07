@@ -1,3 +1,5 @@
+#pragma once
+
 #include "utils/json.hpp"
 #include <string>
 #include <vector>
