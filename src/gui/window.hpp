@@ -23,6 +23,7 @@ class Window
     void main_loop();
     virtual void update() = 0;
     virtual void draw() = 0;
+    virtual void change_frame(int frame) = 0;
     ~Window();
 
   protected:

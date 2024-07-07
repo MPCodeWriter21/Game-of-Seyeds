@@ -15,7 +15,6 @@ class MenuFrame : private Frame
     ~MenuFrame();
 
   private:
-    bool button_action;
     int selected_option = 0;
     float button_height;
     Vector2 mouse_point, survival_btn_size, pvp_btn_size, exit_btn_size,

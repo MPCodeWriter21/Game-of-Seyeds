@@ -6,25 +6,26 @@ MainApp::MainApp(
     int window_width, int window_height, bool sound, const std::string &title, int fps
 )
     : Window(window_width, window_height, sound, title, fps),
-      current_frame(CurrentFrame::menu), menu_frame(this)
+      current_frame(CurrentFrame::menu), menu_frame(this), survival_frame(this)
 {
     // Load textures
     background_image = LoadImage("resources/background.png");
     ImageResize(&background_image, window_width, window_height);
     background = LoadTextureFromImage(background_image);
     UnloadImage(background_image);
-    LoadMusicStream("resources/background-music.mp3");
+    background_music = LoadMusicStream("resources/background-music.mp3");
+    PlayMusicStream(background_music);
 }
 
 void MainApp::update()
 {
-    // UpdateMusicStream(background_music);
+    UpdateMusicStream(background_music);
     switch (current_frame)
     {
-        case CurrentFrame::menu:
-            menu_frame.update();
+        case CurrentFrame::menu: menu_frame.update(); break;
+        case CurrentFrame::survival:
+            survival_frame.update();
             break;
-            // case CurrentFrame::survival: survival_frame.update(); break;
             // case CurrentFrame::pvp_local: pvp_local_frame.update();
             // break; case CurrentFrame::pvp_network:
             //     pvp_network_frame.update();
@@ -43,7 +44,14 @@ void MainApp::draw()
     switch (current_frame)
     {
         case CurrentFrame::menu: menu_frame.draw(); break;
+        case CurrentFrame::survival: survival_frame.draw(); break;
     }
 }
 
-MainApp::~MainApp() { UnloadTexture(background); }
+void MainApp::change_frame(int frame) { current_frame = (CurrentFrame)frame; }
+
+MainApp::~MainApp()
+{
+    UnloadTexture(background);
+    UnloadMusicStream(background_music);
+}

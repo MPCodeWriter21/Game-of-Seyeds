@@ -1,6 +1,8 @@
 #include "gui/frames/menu.hpp"
+#include "gui/main.hpp"
 #include "gui/widgets.hpp"
 #include "raylib.h"
+#include <cstdlib>
 #include <iostream>
 
 static Color BLUE1 = {169, 134, 190, 255};
@@ -75,7 +77,6 @@ MenuFrame::MenuFrame(Window *parent) : Frame(parent)
 void MenuFrame::update()
 {
     mouse_point = GetMousePosition();
-    button_action = false;
 
     if (IsKeyPressed(KEY_J) || IsKeyPressed(KEY_DOWN) ||
         IsGamepadAxisAsButtonPressed(7, true))
@@ -105,7 +106,19 @@ void MenuFrame::update()
              ))
         set_selected_option(2);
 
-    if (button_action) {}
+    // Check if the user has left-clicked on a button
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+    {
+        if (CheckCollisionPointRec(mouse_point, survival_btn_rect))
+            parent->change_frame(CurrentFrame::survival);
+        else if (CheckCollisionPointRec(mouse_point, pvp_btn_rect))
+            parent->change_frame(CurrentFrame::pvp_menu);
+        else if (CheckCollisionPointRec(mouse_point, exit_btn_rect))
+        {
+            CloseWindow();
+            exit(0);
+        }
+    }
 }
 
 void MenuFrame::draw()

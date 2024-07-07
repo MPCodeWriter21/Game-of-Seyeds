@@ -1,17 +1,19 @@
 #pragma once
 
 #include "gui/frames/menu.hpp"
+#include "gui/frames/survival.hpp"
 #include "gui/window.hpp"
 #include "raylib.h"
 
 enum CurrentFrame
 {
     menu = 0,
-    pvp_local = 1,
-    pvp_network = 2,
-    survival = 3,
-    pvp_results = 4,
-    survival_results = 5
+    pvp_menu = 1,
+    pvp_local = 2,
+    pvp_network = 3,
+    survival = 4,
+    pvp_results = 5,
+    survival_results = 6
 };
 
 class MainApp : public Window
@@ -27,6 +29,7 @@ class MainApp : public Window
 
     void update() override;
     void draw() override;
+    void change_frame(int frame) override;
     ~MainApp();
 
   private:
@@ -36,4 +39,5 @@ class MainApp : public Window
 
     CurrentFrame current_frame;
     MenuFrame menu_frame;
+    SurvivalFrame survival_frame;
 };
