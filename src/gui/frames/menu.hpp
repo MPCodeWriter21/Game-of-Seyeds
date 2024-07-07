@@ -23,6 +23,6 @@ class MenuFrame : private Frame
     Image background_image;
     Texture2D background;
 
-    Sound *menu_move_fx;
+    Sound *menu_move_fx, *menu_select_fx;
     Font *font, *bold_font;
 };

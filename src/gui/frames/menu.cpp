@@ -1,9 +1,7 @@
 #include "gui/frames/menu.hpp"
 #include "gui/main.hpp"
-#include "gui/widgets.hpp"
 #include "raylib.h"
 #include <cstdlib>
-#include <iostream>
 
 static Color BLUE1 = {169, 134, 190, 255};
 static Color BLUE2 = {117, 105, 171, 255};
@@ -40,8 +38,10 @@ MenuFrame::MenuFrame(Window *parent) : Frame(parent)
     font = parent->load_font("m04", "resources/m04.TTF");
     bold_font = parent->load_font("m04b", "resources/m04b.TTF");
 
-    // Load sound
+    // Load sounds
     menu_move_fx = parent->load_sound("menu_move_fx", "resources/menu-move.wav");
+    menu_select_fx =
+        parent->load_sound("_button_click_sound", "resources/button-click.wav");
 
     // Define button bounds on screen
     survival_btn_size = MeasureTextEx(*font, "SURVIVAL", font->baseSize, 2);
@@ -110,13 +110,41 @@ void MenuFrame::update()
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
     {
         if (CheckCollisionPointRec(mouse_point, survival_btn_rect))
+        {
+            PlaySound(*menu_select_fx);
             parent->change_frame(CurrentFrame::survival);
+        }
         else if (CheckCollisionPointRec(mouse_point, pvp_btn_rect))
+        {
+            PlaySound(*menu_select_fx);
             parent->change_frame(CurrentFrame::pvp_menu);
+        }
         else if (CheckCollisionPointRec(mouse_point, exit_btn_rect))
         {
+            PlaySound(*menu_select_fx);
             CloseWindow();
             exit(0);
+        }
+    }
+
+    // Wait for the Enter button being pressed
+    if (IsKeyPressed(KEY_ENTER))
+    {
+        switch (selected_option)
+        {
+            case 0:
+                PlaySound(*menu_select_fx);
+                parent->change_frame(CurrentFrame::survival);
+                break;
+            case 1:
+                PlaySound(*menu_select_fx);
+                parent->change_frame(CurrentFrame::pvp_menu);
+                break;
+            case 2:
+                PlaySound(*menu_select_fx);
+                CloseWindow();
+                exit(0);
+                break;
         }
     }
 }
