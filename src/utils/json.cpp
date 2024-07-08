@@ -129,6 +129,17 @@ JsonObject *JsonObject::set_item(const size_t index, JsonObject *value)
     return this;
 }
 
+JsonObject *JsonObject::push_back_item(JsonObject *value)
+{
+    if (type != JsonObjectType::LIST)
+        throw std::runtime_error(
+            "This method only works for LISTs(5). Current object type: " +
+            std::to_string(type)
+        );
+    items->push_back(value);
+    return this;
+}
+
 JsonObject *JsonObject::set_item(const std::string &key, JsonObject *value)
 {
     if (type != JsonObjectType::DICTIONARY)

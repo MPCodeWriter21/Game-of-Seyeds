@@ -51,6 +51,7 @@ class JsonObject
     const JsonObject *get_item(const size_t index) const;
     const JsonObject *get_item(const std::string &key) const;
     JsonObject *set_item(const size_t index, JsonObject *value);
+    JsonObject *push_back_item(JsonObject *value);
     JsonObject *set_item(const std::string &key, JsonObject *value);
     static JsonObject *parse_json(const std::string &json_text);
     static JsonObject *from_file(const std::string &file_path);
