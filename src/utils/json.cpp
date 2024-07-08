@@ -4,6 +4,7 @@
 #include <cctype>
 #include <cstddef>
 #include <format>
+#include <fstream>
 #include <stdexcept>
 #include <string>
 
@@ -173,6 +174,19 @@ JsonObject *JsonObject::parse_json(const std::string &json_text)
         }
     }
     throw UnexpectedTokenError(first_char, -1, i);
+}
+
+JsonObject *JsonObject::from_file(const std::string &file_path)
+{
+    std::string data = "";
+    std::ifstream file(file_path);
+    char buffer[1024];
+    while (!file.eof())
+    {
+        file.read(buffer, 1024);
+        data.append(buffer, file.gcount());
+    }
+    return JsonObject::parse_string(data);
 }
 
 JsonObject *JsonObject::parse_dictionary(const std::string json_text)

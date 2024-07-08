@@ -28,7 +28,6 @@ enum JsonObjectType
 class JsonObject
 {
     JsonObject(const JsonObject &) = delete;
-    // TODO: Add a open file function
   public:
     JsonObject();
     JsonObject(const long long &value);
@@ -51,6 +50,7 @@ class JsonObject
     const JsonObject *get_item(const size_t index) const;
     const JsonObject *get_item(const std::string &key) const;
     static JsonObject *parse_json(const std::string &json_text);
+    static JsonObject *from_file(const std::string &file_path);
     ~JsonObject();
 
     const JsonObjectType type;
