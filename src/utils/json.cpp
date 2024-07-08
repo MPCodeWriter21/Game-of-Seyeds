@@ -118,6 +118,28 @@ const JsonObject *JsonObject::get_item(const std::string &key) const
     return it->second;
 }
 
+JsonObject *JsonObject::set_item(const size_t index, JsonObject *value)
+{
+    if (type != JsonObjectType::LIST)
+        throw std::runtime_error(
+            "This method only works for LISTs(5). Current object type: " +
+            std::to_string(type)
+        );
+    (*items)[index] = value;
+    return this;
+}
+
+JsonObject *JsonObject::set_item(const std::string &key, JsonObject *value)
+{
+    if (type != JsonObjectType::DICTIONARY)
+        throw std::runtime_error(
+            "This method only works for DICTIONARIES(6). Current object type: " +
+            std::to_string(type)
+        );
+    (*item_map)[key] = value;
+    return this;
+}
+
 JsonObject *JsonObject::parse_json(const std::string &json_text)
 {
     // TODO: Handle some errors here and throw them back with more/more accurate
