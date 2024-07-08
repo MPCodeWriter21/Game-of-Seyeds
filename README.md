@@ -1,8 +1,22 @@
 Game of Seyeds
 ==============
 
-A game in which Seyed and others take turns to answer questions about several topics and
-find the greatest of them all!
+![GameOfSeyeds](https://github.com/MPCodeWriter21/Game-of-Seyeds/raw/dev/screen-shots/menu.png)
+
+A quiz game in which Seyed and others take turns to answer questions about several topics
+and find the greatest of them all!
+
+The questions are provided by the [Trivia API](https://opentdb.com/).
+
+What is in this repo?
+---------------------
+
++ [x] A custom json parser.
++ [x] A simple interface to get questions from the Trivia API (Uses libcurl as backend).
++ [x] Immediate Mode GUI made with [raylib](https://www.raylib.com/).
++ [x] CMakeLists.txt that can generate build files based on your setup and will download raylib and cURL automatically.
++ [x] Survival game with a difficulty choice and keeping track of games played and the highscore.
++ [ ] Multiplayer PvP game across different machines with sockets.
 
 Build
 -----
@@ -37,15 +51,6 @@ cmake ..
 cmake --build .
 ```
 
-Features and Plans
-------------------
-
-+ [x] Have a handwritten custom JSON parser.
-+ [x] Have CMake download the cURL.
-+ [x] Send requests to the OpenTDB API and get questions in a nicely formatted form.
-+ [ ] A simple GUI
-+ [ ] Multiplayer with sockets
-
 About
 -----
 
@@ -63,3 +68,6 @@ References
 
 + [JSON](https://www.json.org/json-en.html)
 + [RFC8259](https://datatracker.ietf.org/doc/html/rfc8259)
++ [RayLib](https://www.raylib.com/)
++ [Trivia API](https://opentdb.com/)
++ [cURL](https://curl.se/libcurl/)
