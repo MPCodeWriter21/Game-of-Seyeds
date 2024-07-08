@@ -314,7 +314,7 @@ void SurvivalFrame::more_questions()
             {
                 more_questions_state = MoreQuestionsState::GETTING_MORE_QUESTIONS;
                 auto response = opentdb::get_questions(
-                    20, opentdb::Category::SCIENCE_COMPUTERS, difficulty, "multiple"
+                    20, opentdb::Category::ANY_CATEGORY, difficulty, "multiple"
                 );
                 if (response.response_code != 0) // CURLE_OK
                 {
