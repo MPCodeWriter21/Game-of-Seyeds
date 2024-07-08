@@ -2,6 +2,7 @@
 
 #include <format>
 #include <stdexcept>
+#include <string>
 
 #define _LONG long long
 
