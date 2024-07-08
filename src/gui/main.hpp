@@ -4,6 +4,7 @@
 #include "gui/frames/survival.hpp"
 #include "gui/window.hpp"
 #include "raylib.h"
+#include <string>
 
 enum CurrentFrame
 {
