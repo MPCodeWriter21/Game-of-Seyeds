@@ -48,13 +48,14 @@ class JsonObject
     template <typename T> inline const T &get_value() const;
     const std::vector<JsonObject *> &get_items() const;
     const std::map<std::string, JsonObject *> &get_item_map() const;
-    const JsonObject *get_item(const size_t index) const;
-    const JsonObject *get_item(const std::string &key) const;
+    JsonObject *get_item(const size_t index) const;
+    JsonObject *get_item(const std::string &key) const;
     JsonObject *set_item(const size_t index, JsonObject *value);
     JsonObject *push_back_item(JsonObject *value);
     JsonObject *set_item(const std::string &key, JsonObject *value);
     static JsonObject *parse_json(const std::string &json_text);
     static JsonObject *from_file(const std::string &file_path);
+    void to_file(const std::string &file_path) const;
     ~JsonObject();
 
     const JsonObjectType type;

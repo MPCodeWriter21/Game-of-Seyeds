@@ -95,7 +95,7 @@ const std::map<std::string, JsonObject *> &JsonObject::get_item_map() const
     return *item_map;
 }
 
-const JsonObject *JsonObject::get_item(const size_t index) const
+JsonObject *JsonObject::get_item(const size_t index) const
 {
     if (type != JsonObjectType::LIST)
         throw std::runtime_error(
@@ -105,7 +105,7 @@ const JsonObject *JsonObject::get_item(const size_t index) const
     return (*items)[index];
 }
 
-const JsonObject *JsonObject::get_item(const std::string &key) const
+JsonObject *JsonObject::get_item(const std::string &key) const
 {
     if (type != JsonObjectType::DICTIONARY)
         throw std::runtime_error(
@@ -219,7 +219,14 @@ JsonObject *JsonObject::from_file(const std::string &file_path)
         file.read(buffer, 1024);
         data.append(buffer, file.gcount());
     }
-    return JsonObject::parse_string(data);
+    return JsonObject::parse_json(data);
+}
+
+void JsonObject::to_file(const std::string &file_path) const
+{
+    std::ofstream file(file_path, std::ios::out);
+    file << to_string();
+    file.close();
 }
 
 JsonObject *JsonObject::parse_dictionary(const std::string json_text)
