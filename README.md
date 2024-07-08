@@ -1,7 +1,7 @@
 Game of Seyeds
 ==============
 
-![GameOfSeyeds](https://github.com/MPCodeWriter21/Game-of-Seyeds/raw/dev/screen-shots/menu.png)
+![GameOfSeyeds](https://github.com/MPCodeWriter21/Game-of-Seyeds/raw/master/screen-shots/menu.png)
 
 A quiz game in which Seyed and others take turns to answer questions about several topics
 and find the greatest of them all!
