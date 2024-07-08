@@ -31,7 +31,6 @@ void MainApp::update()
             // break; case CurrentFrame::pvp_network:
             //     pvp_network_frame.update();
             //     break;
-            // case CurrentFrame::survival_results: survival_results_frame.update();
             // case CurrentFrame::pvp_results:
             // pvp_results_frame.update();
     }

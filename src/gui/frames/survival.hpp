@@ -10,7 +10,8 @@ enum SurvivalScreen
 {
     CHOOSING_DIFFICULTY = 0,
     ANSWERING_QUESTION = 1,
-    IN_BETWEEN_QUESTIONS = 2
+    IN_BETWEEN_QUESTIONS = 2,
+    SURVIVAL_RESULTS = 3
 };
 
 enum MoreQuestionsState
@@ -36,7 +37,11 @@ class SurvivalFrame : private Frame
     void update_in_between_questions();
     void draw_in_between_questions();
 
+    void update_survival_results();
+    void draw_survival_results();
+
     void more_questions();
+    void game_over();
 
     ~SurvivalFrame();
 
@@ -44,6 +49,7 @@ class SurvivalFrame : private Frame
     Font *m04_font, *text_font;
     Sound *blink_sound;
     Texture2D question_background;
+    Vector2 score_text_size, highscore_text_size, score_pos;
 
     Button *choosing_difficulty_easy_button, *choosing_difficulty_medium_button,
         *choosing_difficulty_hard_button;
@@ -54,5 +60,7 @@ class SurvivalFrame : private Frame
     SurvivalScreen current_screen = SurvivalScreen::CHOOSING_DIFFICULTY;
     std::string difficulty = "easy";
     std::vector<opentdb::Question> questions;
-    size_t question_index = 0;
+    size_t question_index = 0, score = 0, highscore = 0;
+    int correct_option = 0;
+    time_t start_time = 0;
 };

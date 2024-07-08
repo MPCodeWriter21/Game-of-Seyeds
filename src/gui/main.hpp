@@ -12,8 +12,7 @@ enum CurrentFrame
     pvp_local = 2,
     pvp_network = 3,
     survival = 4,
-    pvp_results = 5,
-    survival_results = 6
+    pvp_results = 5
 };
 
 class MainApp : public Window

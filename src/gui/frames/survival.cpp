@@ -1,17 +1,21 @@
 #include "api/opentdb.hpp"
 #include "gui/frames/survival.hpp"
+#include "gui/main.hpp"
 #include "gui/widgets.hpp"
 #include "raylib.h"
+#include "utils/json.hpp"
 #include <cstdlib>
+#include <ctime>
 #include <exception>
-#include <stdexcept>
+#include <filesystem>
+#include <iostream>
 #include <string>
 #include <thread>
 
 SurvivalFrame::SurvivalFrame(Window *parent) : Frame(parent)
 {
     Image question_background_image = LoadImage("resources/question-background.png");
-    ImageResize(&question_background_image, get_width()-30, get_height()-30);
+    ImageResize(&question_background_image, get_width() - 30, get_height() - 30);
     question_background = LoadTextureFromImage(question_background_image);
     UnloadImage(question_background_image);
 
@@ -68,6 +72,7 @@ SurvivalFrame::SurvivalFrame(Window *parent) : Frame(parent)
             100, option_buttons[i - 1].get_bounds().y +
                      option_buttons[i - 1].get_bounds().height + 50
         ));
+    correct_option = rand() % 4;
 }
 
 void SurvivalFrame::update()
@@ -77,6 +82,7 @@ void SurvivalFrame::update()
         case SurvivalScreen::CHOOSING_DIFFICULTY: update_choosing_difficulty(); break;
         case SurvivalScreen::ANSWERING_QUESTION: update_answering_question(); break;
         case SurvivalScreen::IN_BETWEEN_QUESTIONS: update_in_between_questions(); break;
+        case SurvivalScreen::SURVIVAL_RESULTS: update_survival_results(); break;
     }
 }
 
@@ -87,6 +93,7 @@ void SurvivalFrame::draw()
         case SurvivalScreen::CHOOSING_DIFFICULTY: draw_choosing_difficulty(); break;
         case SurvivalScreen::ANSWERING_QUESTION: draw_answering_question(); break;
         case SurvivalScreen::IN_BETWEEN_QUESTIONS: draw_in_between_questions(); break;
+        case SurvivalScreen::SURVIVAL_RESULTS: draw_survival_results(); break;
     }
 }
 
@@ -118,9 +125,32 @@ void SurvivalFrame::update_answering_question()
 {
     if (questions.size() - question_index < 4)
         more_questions();
+    if (more_questions_state == MoreQuestionsState::GETTING_MORE_QUESTIONS ||
+        start_time == 0)
+        start_time = time(0);
+    if (time(0) - start_time > 15)
+        game_over();
     if (question_index < questions.size())
         for (int i = 0; i < 4; i++)
+        {
             option_buttons[i].update();
+            if (option_buttons[i].pressed)
+            {
+                if (i == correct_option)
+                // Correct choice
+                {
+                    correct_option = rand() % 4;
+                    question_index++;
+                    score++;
+                    start_time = time(0);
+                }
+                // Incorrect choice
+                else
+                {
+                    game_over();
+                }
+            }
+        }
 }
 
 void SurvivalFrame::draw_answering_question()
@@ -128,11 +158,20 @@ void SurvivalFrame::draw_answering_question()
     if (question_index < questions.size())
     {
         DrawTexture(question_background, 15, 15, Color(0xff, 0xff, 0xff, 0x77));
+        // Draw the timer (A number in the top right corner of screen)
+        Vector2 timer_size = MeasureTextEx(
+            *text_font, std::to_string(15 - time(0) + start_time).c_str(),
+            text_font->baseSize / 2, 1
+        );
+        DrawTextEx(
+            *text_font, std::to_string(15 - time(0) + start_time).c_str(),
+            {get_width() - 40 - timer_size.x, 40}, text_font->baseSize / 2, 1, WHITE
+        );
+        // Draw the question and the options
         DrawTextEx(
             *text_font, questions[question_index].question.c_str(), {70, 70},
             text_font->baseSize / 2, 1, RAYWHITE
         );
-        int correct_option = 0; // rand() % 4
         for (int i = 0; i < 4; i++)
         {
             if (i == correct_option)
@@ -190,6 +229,9 @@ void SurvivalFrame::update_in_between_questions()
     // Go to the ANSWERING_QUESTION screen when Enter button is pressed.
     if (IsKeyPressed(KEY_ENTER))
         current_screen = SurvivalScreen::ANSWERING_QUESTION;
+    // Left clicking on the screen should also be acceptable
+    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && IsGestureDetected(GESTURE_TAP))
+        current_screen = SurvivalScreen::ANSWERING_QUESTION;
 }
 
 void SurvivalFrame::draw_in_between_questions()
@@ -231,6 +273,38 @@ void SurvivalFrame::draw_in_between_questions()
     frame_counter++;
 }
 
+void SurvivalFrame::update_survival_results()
+{
+    // Go to the ANSWERING_QUESTION screen when Enter button is pressed.
+    if (IsKeyPressed(KEY_ENTER) ||
+        (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && IsGestureDetected(GESTURE_TAP)))
+    {
+        question_index = 0;
+        score = 0;
+        start_time = 0;
+        difficulty = "easy";
+        getting_questions_error = "";
+        more_questions_state = MoreQuestionsState::GOT_MORE_QUESTIONS;
+        questions.clear();
+        current_screen = SurvivalScreen::CHOOSING_DIFFICULTY;
+        parent->change_frame(CurrentFrame::menu);
+    }
+}
+
+void SurvivalFrame::draw_survival_results()
+{
+    // Draw your score and high-score
+    DrawTextEx(
+        *text_font, ("Score: " + std::to_string(score)).c_str(), score_pos,
+        text_font->baseSize, 1, WHITE
+    );
+    DrawTextEx(
+        *text_font, ("High Score: " + std::to_string(highscore)).c_str(),
+        Vector2(score_pos.x, score_pos.y + score_text_size.y), text_font->baseSize, 1,
+        GOLD
+    );
+}
+
 void SurvivalFrame::more_questions()
 {
     static std::thread *questions_thread = nullptr;
@@ -240,7 +314,7 @@ void SurvivalFrame::more_questions()
             {
                 more_questions_state = MoreQuestionsState::GETTING_MORE_QUESTIONS;
                 auto response = opentdb::get_questions(
-                    20, opentdb::Category::ANY_CATEGORY, difficulty, "multiple"
+                    20, opentdb::Category::SCIENCE_COMPUTERS, difficulty, "multiple"
                 );
                 if (response.response_code != 0) // CURLE_OK
                 {
@@ -248,26 +322,71 @@ void SurvivalFrame::more_questions()
                                               std::to_string(response.response_code) +
                                               "`";
                     more_questions_state = MoreQuestionsState::FAILED_TO_GET_QUESTIONS;
-                    return;
                 }
-                for (auto question : response.results)
-                    questions.push_back(question);
-                more_questions_state = MoreQuestionsState::GOT_MORE_QUESTIONS;
+                else
+                {
+                    for (auto question : response.results)
+                        questions.push_back(question);
+                    more_questions_state = MoreQuestionsState::GOT_MORE_QUESTIONS;
+                }
             }
-            catch (std::runtime_error &exception)
+            catch (std::exception &exception)
             {
                 getting_questions_error = exception.what();
                 more_questions_state = MoreQuestionsState::FAILED_TO_GET_QUESTIONS;
-                return;
             }
         });
     else if (more_questions_state == MoreQuestionsState::GOT_MORE_QUESTIONS)
     {
+        questions_thread->detach();
         delete questions_thread;
         questions_thread = nullptr;
     }
     else if (more_questions_state == MoreQuestionsState::FAILED_TO_GET_QUESTIONS)
         delete questions_thread;
+}
+
+void SurvivalFrame::game_over()
+{
+    // Load the current score log file containing the high-score
+    json::JsonObject *survival_log;
+    // Check if the survival.json exists and is not empty
+    if (std::filesystem::exists("survival.json") &&
+        std::filesystem::file_size("survival.json") > 0)
+        survival_log = json::JsonObject::from_file("survival.json");
+    else
+        survival_log =
+            json::JsonObject::parse_json("{\"highscore\": 0, \"games_played\": []}");
+    const json::JsonObject *highscore_item = survival_log->get_item("highscore");
+    if (highscore_item != nullptr)
+        highscore = highscore_item->get_value<long long>();
+    highscore = (score > highscore) ? score : highscore;
+    survival_log->set_item("highscore", new json::JsonObject((long long)highscore));
+    json::JsonObject *games_played = survival_log->get_item("games_played");
+    if (games_played == nullptr)
+    {
+        games_played = json::JsonObject::parse_json("[]");
+        survival_log->set_item("games_played", games_played);
+    }
+    games_played->push_back_item(json::JsonObject::parse_json(
+        "{\"time\": " + std::to_string(time(0)) +
+        ", \"score\": " + std::to_string(score) + "}"
+    ));
+    survival_log->to_file("survival.json");
+    // Set the position for the score texts
+    score_text_size = MeasureTextEx(
+        *text_font, ("Score: " + std::to_string(score)).c_str(), text_font->baseSize, 1
+    );
+    highscore_text_size = MeasureTextEx(
+        *text_font, ("High Score: " + std::to_string(highscore)).c_str(),
+        text_font->baseSize, 1
+    );
+    score_pos = Vector2(
+        this->get_width() / 2 - score_text_size.x / 2,
+        this->get_height() / 2 - (score_text_size.y + highscore_text_size.y) / 2
+    );
+    // Change the screen
+    current_screen = SurvivalScreen::SURVIVAL_RESULTS;
 }
 
 SurvivalFrame::~SurvivalFrame()
