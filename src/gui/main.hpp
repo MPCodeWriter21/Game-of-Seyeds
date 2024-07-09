@@ -1,6 +1,8 @@
 #pragma once
 
 #include "gui/frames/menu.hpp"
+#include "gui/frames/pvp_local.hpp"
+#include "gui/frames/pvp_menu.hpp"
 #include "gui/frames/survival.hpp"
 #include "gui/window.hpp"
 #include "raylib.h"
@@ -40,4 +42,6 @@ class MainApp : public Window
     CurrentFrame current_frame;
     MenuFrame menu_frame;
     SurvivalFrame survival_frame;
+    PvPMenuFrame pvp_menu_frame;
+    PvPLocalFrame pvp_local_frame;
 };

@@ -6,7 +6,8 @@ MainApp::MainApp(
     int window_width, int window_height, bool sound, const std::string &title, int fps
 )
     : Window(window_width, window_height, sound, title, fps),
-      current_frame(CurrentFrame::menu), menu_frame(this), survival_frame(this)
+      current_frame(CurrentFrame::menu), menu_frame(this), survival_frame(this),
+      pvp_menu_frame(this), pvp_local_frame(this)
 {
     // Load textures
     background_image = LoadImage("resources/background.png");
@@ -24,11 +25,12 @@ void MainApp::update()
     switch (current_frame)
     {
         case CurrentFrame::menu: menu_frame.update(); break;
-        case CurrentFrame::survival:
-            survival_frame.update();
+        case CurrentFrame::survival: survival_frame.update(); break;
+        case CurrentFrame::pvp_menu: pvp_menu_frame.update(); break;
+        case CurrentFrame::pvp_local:
+            pvp_local_frame.update();
             break;
-            // case CurrentFrame::pvp_local: pvp_local_frame.update();
-            // break; case CurrentFrame::pvp_network:
+            // case CurrentFrame::pvp_network:
             //     pvp_network_frame.update();
             //     break;
             // case CurrentFrame::pvp_results:
@@ -45,6 +47,8 @@ void MainApp::draw()
     {
         case CurrentFrame::menu: menu_frame.draw(); break;
         case CurrentFrame::survival: survival_frame.draw(); break;
+        case CurrentFrame::pvp_menu: pvp_menu_frame.draw(); break;
+        case CurrentFrame::pvp_local: pvp_local_frame.draw(); break;
     }
 }
 

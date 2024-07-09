@@ -51,7 +51,7 @@ class Button : public Widget
     bool is_pressed() const { return state == ButtonState::PRESSED; }
     ~Button();
 
-    bool pressed = false;
+    bool pressed = false; // Is true in the frame that the left mouse button went down
 
   private:
     Vector2 text_position, text_size;
